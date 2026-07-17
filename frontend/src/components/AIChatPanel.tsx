@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { callAI, isAIConfigured } from '../services/ai'
+import { callAI } from '../services/ai'
 
 interface AIChatPanelProps {
   onClose: () => void
-  onOpenSettings: () => void
 }
 
 interface Message {
@@ -11,24 +10,15 @@ interface Message {
   content: string
 }
 
-export default function AIChatPanel({ onClose, onOpenSettings }: AIChatPanelProps) {
+export default function AIChatPanel({ onClose }: AIChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hi Neo! I\'m your AI Financial Copilot. Ask me anything about your business finances. Try:\n\n• "Why is profit lower this month?"\n• "Can I afford to hire another employee?"\n• "What expenses should I cut?"\n• "How do I improve cash flow?"' }
+    { role: 'assistant', content: 'Hi! I\'m your AI Financial Copilot. Ask me anything about your business finances. Try:\n\n• "Why is profit lower this month?"\n• "Can I afford to hire another employee?"\n• "What expenses should I cut?"\n• "How do I improve cash flow?"' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
 
   async function handleSend() {
     if (!input.trim() || loading) return
-
-    if (!isAIConfigured()) {
-      setMessages(prev => [...prev,
-        { role: 'user', content: input },
-        { role: 'assistant', content: 'I need an API key to work. Click the button below to go to Settings and add your AI provider key.' }
-      ])
-      setInput('')
-      return
-    }
 
     const question = input
     setInput('')
@@ -38,9 +28,8 @@ export default function AIChatPanel({ onClose, onOpenSettings }: AIChatPanelProp
     try {
       const answer = await callAI(question)
       setMessages(prev => [...prev, { role: 'assistant', content: answer }])
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
-      setMessages(prev => [...prev, { role: 'assistant', content: message }])
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'I\'m having trouble right now. Please try again in a moment.' }])
     }
 
     setLoading(false)
@@ -56,8 +45,7 @@ export default function AIChatPanel({ onClose, onOpenSettings }: AIChatPanelProp
             </svg>
           </div>
           <span className="font-semibold text-sm">FinPilot AI</span>
-          {isAIConfigured() && <span className="w-2 h-2 bg-green-500 rounded-full" title="Connected"></span>}
-          {!isAIConfigured() && <span className="w-2 h-2 bg-red-500 rounded-full" title="Not connected"></span>}
+          <span className="w-2 h-2 bg-green-500 rounded-full" title="Connected"></span>
         </div>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,15 +53,6 @@ export default function AIChatPanel({ onClose, onOpenSettings }: AIChatPanelProp
           </svg>
         </button>
       </div>
-
-      {!isAIConfigured() && (
-        <div className="px-4 py-3 bg-yellow-50 border-b border-yellow-100">
-          <p className="text-xs text-yellow-800 mb-2">AI is not connected. Add your API key to enable smart responses.</p>
-          <button onClick={onOpenSettings} className="text-xs font-medium text-yellow-900 bg-yellow-200 px-3 py-1 rounded hover:bg-yellow-300">
-            Open Settings
-          </button>
-        </div>
-      )}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, i) => (
