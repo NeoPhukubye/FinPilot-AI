@@ -56,6 +56,8 @@ async def chat(request: ChatRequest):
             reply = data["candidates"][0]["content"]["parts"][0]["text"]
             return ChatResponse(reply=reply)
     except httpx.HTTPStatusError as e:
+        if e.response.status_code == 429:
+            return ChatResponse(reply="I'm getting a lot of questions right now. Please wait a few seconds and try again.")
         return ChatResponse(reply=f"AI error: {e.response.status_code}. Check that your Gemini API key is valid.")
     except Exception:
         return ChatResponse(reply="Something went wrong connecting to the AI. Please try again.")
