@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import Dashboard from './pages/Dashboard'
+import Register from './pages/Register'
+import Transactions from './pages/Transactions'
+import GrowthTips from './pages/GrowthTips'
 import AIChatPanel from './components/AIChatPanel'
 import Sidebar from './components/Sidebar'
 
@@ -7,19 +10,24 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [chatOpen, setChatOpen] = useState(false)
 
+  const titles: Record<string, string> = {
+    dashboard: 'Dashboard',
+    transactions: 'Money In & Out',
+    growth: 'Grow Your Money',
+    register: 'Register',
+    cashflow: 'Cash Flow',
+    invoices: 'Invoices',
+    expenses: 'Expenses',
+    forecast: 'Forecast Simulator',
+  }
+
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="flex-1 overflow-y-auto">
         <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-100 px-8 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">
-              {activeTab === 'dashboard' && 'Dashboard'}
-              {activeTab === 'cashflow' && 'Cash Flow'}
-              {activeTab === 'invoices' && 'Invoices'}
-              {activeTab === 'expenses' && 'Expenses'}
-              {activeTab === 'forecast' && 'Forecast Simulator'}
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-900">{titles[activeTab] || 'Dashboard'}</h1>
             <p className="text-sm text-gray-500">AI-powered financial insights</p>
           </div>
           <button
@@ -33,7 +41,10 @@ export default function App() {
           </button>
         </header>
         <div className="p-8">
-          <Dashboard />
+          {activeTab === 'dashboard' && <Dashboard />}
+          {activeTab === 'transactions' && <Transactions />}
+          {activeTab === 'growth' && <GrowthTips />}
+          {activeTab === 'register' && <Register />}
         </div>
       </main>
       {chatOpen && <AIChatPanel onClose={() => setChatOpen(false)} />}
