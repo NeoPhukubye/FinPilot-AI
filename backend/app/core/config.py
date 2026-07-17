@@ -14,8 +14,8 @@ class Settings(BaseSettings):
 
     # AI / LLM
     llm_api_key: str = ""
-    llm_base_url: str = "https://api.fireworks.ai/inference/v1"
-    llm_model: str = "accounts/fireworks/models/llama-v3p1-70b-instruct"
+    llm_base_url: str = "https://api.groq.com/openai/v1"
+    llm_model: str = "llama-3.1-70b-versatile"
 
     # JWT
     secret_key: str = "change-me-in-production"

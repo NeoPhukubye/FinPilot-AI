@@ -2,17 +2,13 @@ services:
   - type: web
     name: finpilot-api
     runtime: python
+    rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: LLM_API_KEY
         sync: false
       - key: LLM_BASE_URL
-        value: https://api.fireworks.ai/inference/v1
+        value: https://api.groq.com/openai/v1
       - key: LLM_MODEL
-        value: accounts/fireworks/models/llama-v3p1-70b-instruct
-      - key: DATABASE_URL
-        value: sqlite+aiosqlite:///./finpilot.db
-      - key: PYTHON_VERSION
-        value: "3.12"
-    rootDir: backend
+        value: llama-3.1-70b-versatile
