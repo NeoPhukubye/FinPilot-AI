@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { askAI } from '../services/api'
+import { callAI, isAIConfigured } from '../services/ai'
 
 interface AIChatPanelProps {
   onClose: () => void
+  onOpenSettings: () => void
 }
 
 interface Message {
@@ -10,25 +11,38 @@ interface Message {
   content: string
 }
 
-export default function AIChatPanel({ onClose }: AIChatPanelProps) {
+export default function AIChatPanel({ onClose, onOpenSettings }: AIChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hi Neo! I\'m your AI Financial Copilot. Ask me anything about your business finances. Try:\n\n• "Why is profit lower this month?"\n• "Can I afford to hire another employee?"\n• "What expenses should I cut?"' }
+    { role: 'assistant', content: 'Hi Neo! I\'m your AI Financial Copilot. Ask me anything about your business finances. Try:\n\n• "Why is profit lower this month?"\n• "Can I afford to hire another employee?"\n• "What expenses should I cut?"\n• "How do I improve cash flow?"' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
 
   async function handleSend() {
     if (!input.trim() || loading) return
+
+    if (!isAIConfigured()) {
+      setMessages(prev => [...prev,
+        { role: 'user', content: input },
+        { role: 'assistant', content: 'I need an API key to work. Click the button below to go to Settings and add your AI provider key.' }
+      ])
+      setInput('')
+      return
+    }
+
     const question = input
     setInput('')
     setMessages(prev => [...prev, { role: 'user', content: question }])
     setLoading(true)
+
     try {
-      const result = await askAI(question)
-      setMessages(prev => [...prev, { role: 'assistant', content: result.answer }])
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'I\'m having trouble connecting to the AI service. Please try again.' }])
+      const answer = await callAI(question)
+      setMessages(prev => [...prev, { role: 'assistant', content: answer }])
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      setMessages(prev => [...prev, { role: 'assistant', content: message }])
     }
+
     setLoading(false)
   }
 
@@ -42,6 +56,8 @@ export default function AIChatPanel({ onClose }: AIChatPanelProps) {
             </svg>
           </div>
           <span className="font-semibold text-sm">FinPilot AI</span>
+          {isAIConfigured() && <span className="w-2 h-2 bg-green-500 rounded-full" title="Connected"></span>}
+          {!isAIConfigured() && <span className="w-2 h-2 bg-red-500 rounded-full" title="Not connected"></span>}
         </div>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,6 +65,16 @@ export default function AIChatPanel({ onClose }: AIChatPanelProps) {
           </svg>
         </button>
       </div>
+
+      {!isAIConfigured() && (
+        <div className="px-4 py-3 bg-yellow-50 border-b border-yellow-100">
+          <p className="text-xs text-yellow-800 mb-2">AI is not connected. Add your API key to enable smart responses.</p>
+          <button onClick={onOpenSettings} className="text-xs font-medium text-yellow-900 bg-yellow-200 px-3 py-1 rounded hover:bg-yellow-300">
+            Open Settings
+          </button>
+        </div>
+      )}
+
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -63,12 +89,18 @@ export default function AIChatPanel({ onClose }: AIChatPanelProps) {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 rounded-lg px-4 py-2 text-sm text-gray-500">
-              Analyzing your finances...
+            <div className="bg-gray-100 rounded-lg px-4 py-2 text-sm text-gray-500 flex items-center gap-2">
+              <span className="flex gap-1">
+                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+              </span>
+              Thinking...
             </div>
           </div>
         )}
       </div>
+
       <div className="p-4 border-t border-gray-100">
         <div className="flex gap-2">
           <input

@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard'
 import Register from './pages/Register'
 import Transactions from './pages/Transactions'
 import GrowthTips from './pages/GrowthTips'
+import Settings from './pages/Settings'
 import AIChatPanel from './components/AIChatPanel'
 import Sidebar from './components/Sidebar'
 
@@ -15,10 +16,7 @@ export default function App() {
     transactions: 'Money In & Out',
     growth: 'Grow Your Money',
     register: 'Register',
-    cashflow: 'Cash Flow',
-    invoices: 'Invoices',
-    expenses: 'Expenses',
-    forecast: 'Forecast Simulator',
+    settings: 'Settings',
   }
 
   return (
@@ -45,9 +43,10 @@ export default function App() {
           {activeTab === 'transactions' && <Transactions />}
           {activeTab === 'growth' && <GrowthTips />}
           {activeTab === 'register' && <Register />}
+          {activeTab === 'settings' && <Settings />}
         </div>
       </main>
-      {chatOpen && <AIChatPanel onClose={() => setChatOpen(false)} />}
+      {chatOpen && <AIChatPanel onClose={() => setChatOpen(false)} onOpenSettings={() => { setChatOpen(false); setActiveTab('settings') }} />}
     </div>
   )
 }
