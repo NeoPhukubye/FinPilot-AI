@@ -32,23 +32,24 @@ class ChatResponse(BaseModel):
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.llm_model}:generateContent?key={settings.llm_api_key}"
+
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(
-            f"{settings.llm_base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {settings.llm_api_key}"},
+            url,
             json={
-                "model": settings.llm_model,
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": request.message},
+                "contents": [
+                    {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser question: {request.message}"}]}
                 ],
-                "temperature": 0.4,
-                "max_tokens": 512,
+                "generationConfig": {
+                    "temperature": 0.4,
+                    "maxOutputTokens": 512,
+                },
             },
         )
         response.raise_for_status()
         data = response.json()
-        reply = data["choices"][0]["message"]["content"]
+        reply = data["candidates"][0]["content"]["parts"][0]["text"]
         return ChatResponse(reply=reply)
 
 

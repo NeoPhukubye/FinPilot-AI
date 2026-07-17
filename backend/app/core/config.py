@@ -12,10 +12,10 @@ class Settings(BaseSettings):
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 
-    # AI / LLM
+    # AI / LLM (Google Gemini)
     llm_api_key: str = ""
-    llm_base_url: str = "https://api.groq.com/openai/v1"
-    llm_model: str = "llama-3.1-70b-versatile"
+    llm_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
+    llm_model: str = "gemini-2.0-flash"
 
     # JWT
     secret_key: str = "change-me-in-production"
