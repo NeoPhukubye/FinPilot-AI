@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     # AI / LLM (Google Gemini)
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-1.5-flash"
+    gemini_model: str = "gemini-1.5-flash-latest"
 
     # JWT
     secret_key: str = "change-me-in-production"
