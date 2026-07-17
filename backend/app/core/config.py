@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Database
-    database_url: str = "postgresql+asyncpg://finpilot:finpilot@localhost:5432/finpilot"
+    database_url: str = "sqlite+aiosqlite:///./finpilot.db"
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"
