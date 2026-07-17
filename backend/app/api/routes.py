@@ -32,25 +32,33 @@ class ChatResponse(BaseModel):
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
+    if not settings.llm_api_key:
+        return ChatResponse(reply="AI service is not configured yet. Please set the LLM_API_KEY environment variable.")
+
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.llm_model}:generateContent?key={settings.llm_api_key}"
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(
-            url,
-            json={
-                "contents": [
-                    {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser question: {request.message}"}]}
-                ],
-                "generationConfig": {
-                    "temperature": 0.4,
-                    "maxOutputTokens": 512,
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                url,
+                json={
+                    "contents": [
+                        {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser question: {request.message}"}]}
+                    ],
+                    "generationConfig": {
+                        "temperature": 0.4,
+                        "maxOutputTokens": 512,
+                    },
                 },
-            },
-        )
-        response.raise_for_status()
-        data = response.json()
-        reply = data["candidates"][0]["content"]["parts"][0]["text"]
-        return ChatResponse(reply=reply)
+            )
+            response.raise_for_status()
+            data = response.json()
+            reply = data["candidates"][0]["content"]["parts"][0]["text"]
+            return ChatResponse(reply=reply)
+    except httpx.HTTPStatusError as e:
+        return ChatResponse(reply=f"AI error: {e.response.status_code}. Check that your Gemini API key is valid.")
+    except Exception:
+        return ChatResponse(reply="Something went wrong connecting to the AI. Please try again.")
 
 
 @router.get("/health-score")
