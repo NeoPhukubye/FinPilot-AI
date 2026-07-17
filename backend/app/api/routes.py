@@ -32,10 +32,10 @@ class ChatResponse(BaseModel):
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    if not settings.llm_api_key:
-        return ChatResponse(reply="AI service is not configured yet. Please set the LLM_API_KEY environment variable.")
+    if not settings.gemini_api_key:
+        return ChatResponse(reply="AI service is not configured yet. Please set the GEMINI_API_KEY environment variable.")
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.llm_model}:generateContent?key={settings.llm_api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent?key={settings.gemini_api_key}"
 
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
