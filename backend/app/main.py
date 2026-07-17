@@ -21,4 +21,9 @@ app.include_router(router, prefix="/api/v1")
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": settings.app_name}
+    return {
+        "status": "healthy",
+        "service": settings.app_name,
+        "ai_configured": bool(settings.gemini_api_key),
+        "model": settings.gemini_model,
+    }
