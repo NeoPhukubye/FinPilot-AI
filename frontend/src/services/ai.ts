@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.PROD
-  ? 'https://finpilot-api.onrender.com/api/v1'
+  ? 'https://finpilot-ai-4vhh.onrender.com/api/v1'
   : '/api/v1'
 
 export async function callAI(message: string): Promise<string> {
