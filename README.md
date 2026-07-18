@@ -24,16 +24,32 @@ Small businesses don't need another dashboard. They need someone who says:
 - **Cash Flow Prediction** — AI predicts cash position 7, 30, 90 days out with confidence
 - **AI CFO** — Natural language explanations, not just numbers
 - **Invoice Intelligence** — Who to invoice, overdue alerts, late payer prediction
+- **Automated Payment Collection** — Collect overdue payments via Pinch Payments with one click
+- **Payment Links** — Send payment links to clients for instant collection
+- **Smart Payment Plans** — AI recommends splitting large debts into manageable instalments
 - **Expense Monitor** — Unusual spending, duplicate payments, forgotten subscriptions
 - **Financial Health Score** — Composite score out of 100 across 6 dimensions
 - **Morning Briefing** — Daily AI-generated priority list
 - **Natural Language Finance** — Ask questions in plain English
 - **Forecast Simulator** — "What if I hire 2 employees?" predictions
 
+### Pinch Payments Integration
+FinPilot uses [Pinch Payments](https://getpinch.com.au) infrastructure to go beyond advice — it takes action:
+
+| Capability | How It Works |
+|-----------|--------------|
+| **Collect Now** | AI flags overdue invoices, one-click triggers Pinch direct debit collection |
+| **Payment Links** | Generate shareable payment links for clients to pay instantly |
+| **Payment Plans** | Split large outstanding amounts into automated instalment plans |
+| **Real-time Data** | Pull live payment data from Pinch to improve AI cash flow predictions |
+
+The integration runs in **demo mode** by default with realistic mock data. Connect your Pinch API credentials to enable live payment collection.
+
 ### Tech Stack
 **Frontend:** React, TypeScript, Tailwind CSS, Recharts, Framer Motion
 **Backend:** FastAPI, Python, PostgreSQL, Redis
-**AI:** OpenAI-compatible LLM (Fireworks AI), Multi-agent architecture
+**AI:** Google Gemini, Multi-agent architecture
+**Payments:** Pinch Payments API (direct debit, cards, payment links)
 
 ### Quick Start
 
@@ -75,9 +91,11 @@ npm run dev
 ```
 DATABASE_URL=postgresql+asyncpg://finpilot:finpilot@localhost:5432/finpilot
 REDIS_URL=redis://localhost:6379/0
-LLM_API_KEY=your-api-key
-LLM_BASE_URL=https://api.fireworks.ai/inference/v1
-LLM_MODEL=accounts/fireworks/models/llama-v3p1-70b-instruct
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-2.0-flash
+PINCH_API_KEY=your-pinch-api-key
+PINCH_SECRET_KEY=your-pinch-secret-key
+PINCH_SANDBOX=true
 ```
 
 ### API Endpoints
@@ -93,6 +111,12 @@ LLM_MODEL=accounts/fireworks/models/llama-v3p1-70b-instruct
 | POST | `/api/v1/ai/ask` | Natural language questions |
 | GET | `/api/v1/ai/morning-briefing` | Daily AI briefing |
 | GET | `/api/v1/recommendations` | Prioritized action items |
+| GET | `/api/v1/payments` | List all payments (Pinch) |
+| GET | `/api/v1/payments/summary` | Payment collection summary |
+| GET | `/api/v1/payers` | List payers/clients |
+| POST | `/api/v1/payments/collect` | Trigger payment collection |
+| POST | `/api/v1/payments/link` | Create a payment link |
+| POST | `/api/v1/payments/plan` | Create a payment plan |
 
 ### Architecture
 ```

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Dashboard from './pages/Dashboard'
 import Register from './pages/Register'
 import Transactions from './pages/Transactions'
+import Payments from './pages/Payments'
 import GrowthTips from './pages/GrowthTips'
 import AIChatPanel from './components/AIChatPanel'
 import Sidebar from './components/Sidebar'
@@ -13,6 +14,7 @@ export default function App() {
   const titles: Record<string, string> = {
     dashboard: 'Dashboard',
     transactions: 'Money In & Out',
+    payments: 'Payments',
     growth: 'Grow Your Money',
     register: 'Register',
   }
@@ -39,6 +41,7 @@ export default function App() {
         <div className="p-8">
           {activeTab === 'dashboard' && <Dashboard />}
           {activeTab === 'transactions' && <Transactions />}
+          {activeTab === 'payments' && <Payments />}
           {activeTab === 'growth' && <GrowthTips />}
           {activeTab === 'register' && <Register />}
         </div>
