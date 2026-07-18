@@ -4,6 +4,7 @@ import httpx
 import asyncio
 
 from app.core.config import get_settings
+from app.services import pinch
 
 router = APIRouter()
 settings = get_settings()
@@ -92,3 +93,62 @@ async def get_recommendations():
         {"action": "Invoice Client B", "reason": "Project delivered 5 days ago", "impact": "Add R42,000"},
         {"action": "Cancel unused Figma licenses", "reason": "3 seats unused for 60+ days", "impact": "Save R2,400/month"},
     ]
+
+
+# --- Pinch Payments Endpoints ---
+
+
+class CollectPaymentRequest(BaseModel):
+    payer_id: str
+    amount: int
+    description: str
+
+
+class PaymentLinkRequest(BaseModel):
+    payer_id: str
+    amount: int
+    description: str
+
+
+class PaymentPlanRequest(BaseModel):
+    payer_id: str
+    total_amount: int
+    instalments: int
+    description: str
+
+
+@router.get("/payments")
+async def get_payments():
+    payments = await pinch.list_payments()
+    return {"payments": payments, "live_mode": pinch._is_live()}
+
+
+@router.get("/payments/summary")
+async def get_payment_summary():
+    return await pinch.get_payment_summary()
+
+
+@router.get("/payers")
+async def get_payers():
+    payers = await pinch.list_payers()
+    return {"payers": payers, "live_mode": pinch._is_live()}
+
+
+@router.post("/payments/collect")
+async def collect_payment(request: CollectPaymentRequest):
+    result = await pinch.collect_payment(request.payer_id, request.amount, request.description)
+    return result
+
+
+@router.post("/payments/link")
+async def create_payment_link(request: PaymentLinkRequest):
+    result = await pinch.create_payment_link(request.payer_id, request.amount, request.description)
+    return result
+
+
+@router.post("/payments/plan")
+async def create_payment_plan(request: PaymentPlanRequest):
+    result = await pinch.create_payment_plan(
+        request.payer_id, request.total_amount, request.instalments, request.description
+    )
+    return result

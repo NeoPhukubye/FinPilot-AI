@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
 
+    # Pinch Payments
+    pinch_api_key: str = ""
+    pinch_secret_key: str = ""
+    pinch_base_url: str = "https://api.getpinch.com.au"
+    pinch_sandbox: bool = True
+
     # JWT
     secret_key: str = "change-me-in-production"
     algorithm: str = "HS256"
