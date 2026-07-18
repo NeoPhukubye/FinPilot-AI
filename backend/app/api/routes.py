@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 import httpx
+import asyncio
 
 from app.core.config import get_settings
 
@@ -37,31 +38,36 @@ async def chat(request: ChatRequest):
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent?key={settings.gemini_api_key}"
 
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                url,
-                json={
-                    "contents": [
-                        {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser question: {request.message}"}]}
-                    ],
-                    "generationConfig": {
-                        "temperature": 0.4,
-                        "maxOutputTokens": 512,
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    url,
+                    json={
+                        "contents": [
+                            {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser question: {request.message}"}]}
+                        ],
+                        "generationConfig": {
+                            "temperature": 0.4,
+                            "maxOutputTokens": 512,
+                        },
                     },
-                },
-            )
-            response.raise_for_status()
-            data = response.json()
-            reply = data["candidates"][0]["content"]["parts"][0]["text"]
-            return ChatResponse(reply=reply)
-    except httpx.HTTPStatusError as e:
-        if e.response.status_code == 429:
-            return ChatResponse(reply="I'm getting a lot of questions right now. Please wait a few seconds and try again.")
-        detail = e.response.text[:200] if e.response.text else ""
-        return ChatResponse(reply=f"AI error ({e.response.status_code}): {detail}")
-    except Exception:
-        return ChatResponse(reply="Something went wrong connecting to the AI. Please try again.")
+                )
+                response.raise_for_status()
+                data = response.json()
+                reply = data["candidates"][0]["content"]["parts"][0]["text"]
+                return ChatResponse(reply=reply)
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 429 and attempt < max_retries - 1:
+                await asyncio.sleep(2 ** attempt)
+                continue
+            if e.response.status_code == 429:
+                return ChatResponse(reply="I'm getting a lot of questions right now. Please wait a few seconds and try again.")
+            detail = e.response.text[:200] if e.response.text else ""
+            return ChatResponse(reply=f"AI error ({e.response.status_code}): {detail}")
+        except Exception:
+            return ChatResponse(reply="Something went wrong connecting to the AI. Please try again.")
 
 
 @router.get("/health-score")
