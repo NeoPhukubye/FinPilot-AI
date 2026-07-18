@@ -1,6 +1,8 @@
 # FinPilot AI
 ## AI Financial Copilot for Small Businesses
 
+> Built by **Neo Phukubye** (Software Engineer) for the [Pinch Hackathon](https://www.thefoundersunion.com) — a national build sprint by **The Founders Union** (Australia) in partnership with **Pinch Payments**, competing for $50,000. July–August 2026.
+
 FinPilot AI is an intelligent financial assistant that goes beyond displaying numbers — it explains what your financial data means and tells you what to do next.
 
 ### The Problem
