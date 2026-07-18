@@ -28,8 +28,11 @@ export default function AIChatPanel({ onClose }: AIChatPanelProps) {
     try {
       const answer = await callAI(question)
       setMessages(prev => [...prev, { role: 'assistant', content: answer }])
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'I\'m having trouble right now. Please try again in a moment.' }])
+    } catch (err: any) {
+      const msg = err?.message === 'not_configured'
+        ? 'The AI assistant is not set up yet. Please ask your administrator to configure the GEMINI_API_KEY on the server.'
+        : 'I\'m having trouble connecting right now. Please check your internet connection and try again in a moment.'
+      setMessages(prev => [...prev, { role: 'assistant', content: msg }])
     }
 
     setLoading(false)

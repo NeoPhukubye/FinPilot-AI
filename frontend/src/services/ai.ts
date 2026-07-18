@@ -14,6 +14,11 @@ export async function callAI(message: string): Promise<string> {
   }
 
   const data = await response.json()
+
+  if (data.reply && data.reply.includes('AI service is not configured')) {
+    throw new Error('not_configured')
+  }
+
   return data.reply
 }
 
