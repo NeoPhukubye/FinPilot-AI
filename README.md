@@ -136,7 +136,7 @@ PINCH_SANDBOX=true
 │  │Expense Agent│ │Forecast Agent         │  │
 │  └─────────────┘ └───────────────────────┘  │
 ├─────────────────────────────────────────────┤
-│  PostgreSQL  │  Redis  │  LLM API           │
+│  PostgreSQL │ Redis │ Gemini AI │ Pinch API │
 └─────────────────────────────────────────────┘
 ```
 
