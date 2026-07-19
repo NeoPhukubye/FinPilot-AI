@@ -13,9 +13,11 @@ class Settings(BaseSettings):
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 
-    # AI / LLM (Google Gemini)
-    gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash"
+    # AI / LLM (Azure OpenAI)
+    azure_openai_api_key: str = ""
+    azure_openai_endpoint: str = ""
+    azure_openai_deployment: str = ""
+    azure_openai_api_version: str = "2024-02-01"
 
     # Pinch Payments
     pinch_api_key: str = ""

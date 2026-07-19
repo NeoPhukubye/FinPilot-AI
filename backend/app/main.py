@@ -36,6 +36,5 @@ async def health_check():
     return {
         "status": "healthy",
         "service": settings.app_name,
-        "ai_configured": bool(settings.gemini_api_key),
-        "model": settings.gemini_model,
+        "ai_configured": bool(settings.azure_openai_api_key and settings.azure_openai_endpoint),
     }

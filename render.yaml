@@ -17,10 +17,14 @@ services:
         fromDatabase:
           name: finpilot-db
           property: connectionURI
-      - key: GEMINI_API_KEY
+      - key: AZURE_OPENAI_API_KEY
         sync: false
-      - key: GEMINI_MODEL
-        value: gemini-2.0-flash
+      - key: AZURE_OPENAI_ENDPOINT
+        sync: false
+      - key: AZURE_OPENAI_DEPLOYMENT
+        sync: false
+      - key: AZURE_OPENAI_API_VERSION
+        value: "2024-02-01"
       - key: PINCH_SANDBOX
         value: "true"
       - key: PYTHON_VERSION

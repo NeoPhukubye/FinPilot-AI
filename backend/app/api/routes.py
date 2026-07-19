@@ -34,10 +34,13 @@ class ChatResponse(BaseModel):
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    if not settings.gemini_api_key:
-        return ChatResponse(reply="AI service is not configured yet. Please set the GEMINI_API_KEY environment variable.")
+    if not settings.azure_openai_api_key or not settings.azure_openai_endpoint:
+        return ChatResponse(reply="AI service is not configured yet. Please set AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT environment variables.")
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent?key={settings.gemini_api_key}"
+    url = (
+        f"{settings.azure_openai_endpoint}/openai/deployments/{settings.azure_openai_deployment}"
+        f"/chat/completions?api-version={settings.azure_openai_api_version}"
+    )
 
     max_retries = 3
     for attempt in range(max_retries):
@@ -45,19 +48,19 @@ async def chat(request: ChatRequest):
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
                     url,
+                    headers={"api-key": settings.azure_openai_api_key},
                     json={
-                        "contents": [
-                            {"role": "user", "parts": [{"text": f"{SYSTEM_PROMPT}\n\nUser question: {request.message}"}]}
+                        "messages": [
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": request.message},
                         ],
-                        "generationConfig": {
-                            "temperature": 0.4,
-                            "maxOutputTokens": 512,
-                        },
+                        "temperature": 0.4,
+                        "max_tokens": 512,
                     },
                 )
                 response.raise_for_status()
                 data = response.json()
-                reply = data["candidates"][0]["content"]["parts"][0]["text"]
+                reply = data["choices"][0]["message"]["content"]
                 return ChatResponse(reply=reply)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 429 and attempt < max_retries - 1:
