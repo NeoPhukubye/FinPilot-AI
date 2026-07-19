@@ -56,7 +56,7 @@ async def chat(request: ChatRequest):
                             {"role": "user", "content": request.message},
                         ],
                         "temperature": 0.4,
-                        "max_tokens": 512,
+                        "max_completion_tokens": 512,
                     },
                 )
                 response.raise_for_status()
