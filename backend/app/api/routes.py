@@ -37,8 +37,9 @@ async def chat(request: ChatRequest):
     if not settings.azure_openai_api_key or not settings.azure_openai_endpoint:
         return ChatResponse(reply="AI service is not configured yet. Please set AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT environment variables.")
 
+    base = settings.azure_openai_endpoint.rstrip("/")
     url = (
-        f"{settings.azure_openai_endpoint}/openai/deployments/{settings.azure_openai_deployment}"
+        f"{base}/openai/deployments/{settings.azure_openai_deployment}"
         f"/chat/completions?api-version={settings.azure_openai_api_version}"
     )
 
