@@ -32,6 +32,19 @@ class ChatResponse(BaseModel):
     reply: str
 
 
+@router.get("/debug/config")
+async def debug_config():
+    key = settings.azure_openai_api_key
+    return {
+        "endpoint": settings.azure_openai_endpoint,
+        "deployment": settings.azure_openai_deployment,
+        "api_version": settings.azure_openai_api_version,
+        "key_set": bool(key),
+        "key_length": len(key),
+        "key_prefix": key[:8] + "..." if len(key) > 8 else "(too short)",
+    }
+
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     if not settings.azure_openai_api_key or not settings.azure_openai_endpoint:
