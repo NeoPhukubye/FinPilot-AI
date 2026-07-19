@@ -1,6 +1,5 @@
-const API_BASE = import.meta.env.PROD
-  ? 'https://finpilot-ai-4vhh.onrender.com/api/v1'
-  : '/api/v1'
+const API_BASE = import.meta.env.VITE_API_URL
+  || (import.meta.env.PROD ? 'https://finpilot-ai-1-s60w.onrender.com/api/v1' : '/api/v1')
 
 export async function callAI(message: string): Promise<string> {
   const response = await fetch(`${API_BASE}/chat`, {
